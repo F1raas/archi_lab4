@@ -1,0 +1,26 @@
+        DADDU   R10,R1,R0        ; Adresse u(1,1)
+        DADDIU  R6,R0,#8         
+        DMULU   R6,R2,R6         ; R6 = largeur d'un vecteur
+        DMULU   R7,R6,R3         ; R7 = décalage entre u11 et v11
+        DADDU   R11,R10,R7       ; Adresse v(1,1)
+        DADDU   R12,R10,R6       ; Adresse u(2,1)
+        DADDIU  R5,R0,#8
+        DMULU   R4,R5,R4         ; R4 contient une adresse en octets, donc x8
+        DMULU   R5,R3,R5
+        DADDU   R5,R4,R5         ; Adresse = R5 somme prod scalaires
+        ADD.D   F4,F0,F0         ; Resultat prod scalaire
+        ADD.D   F5,F0,F0         ; Somme prod scalaires
+Loop:   L.D     F1,0(R10)        ; Lire u(i,j)
+        L.D     F2,0(R11)        ; Lire v(i,j)
+        MUL.D   F3,F1,F2         ; u(i,j) * v(i,j)
+        ADD.D   F4,F3,F4         ; \sum_j u(i,j) * v(i,j)
+        DADDIU  R10,R10,#8       ; Adresse u(i,j+1)
+        DADDIU  R11,R11,#8       ; Adresse v(i,j+1)
+        BNE     R10,R12,Loop     ; Branch jusqu'à ce qu'on arrive à u(i+1,1)
+        DADDU   R12,R6,R12       ; Adresse u(i+1,1)
+        S.D     F4,0(R4)         ; Ecrire prod scalaire
+        ADD.D   F5,F4,F5         ; Sommer
+        ADD.D   F4,F0,F0
+        DADDIU  R4,R4,#8
+        BNE     R4,R5,Loop
+        S.D     F5,0(R4)         ; Ecrire somme prod scalaires

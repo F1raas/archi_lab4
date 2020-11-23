@@ -1,0 +1,22 @@
+        DADDIU  R10,R0,#97      ; voyelles [97, 101, 105, 111, 117, 121]
+        DADDIU  R11,R0,#101
+        DADDIU  R12,R0,#105
+        DADDIU  R13,R0,#111
+        DADDIU  R14,R0,#117
+        DADDIU  R15,R0,#121
+        DADDIU  R1,R0,#0        ; nombre de voyelles
+        ;R3 adresse de départ de la chaîne, R4 adresse de fin
+        ;R5 adresse où écrire le résultat
+Loop:   LD      R2,0(R3)        ; Lire caractère i
+        BEQ     R2,R0,End       ; Fin de la chaîne
+        BEQ     R2,R10,Vowel
+        BEQ     R2,R11,Vowel
+        BEQ     R2,R12,Vowel
+        BEQ     R2,R13,Vowel
+        BEQ     R2,R14,Vowel
+        BEQ     R2,R15,Vowel
+        J       NotVow
+Vowel:  DADDIU  R1,R1,#1
+NotVow: DADDIU  R3,R3,#8
+        J       Loop            ; Jusqu'à ce qu'on arrive à la fin de la chaîne
+End:    SD      R1,0(R5)        ; Ecrire résultat après la chaîne

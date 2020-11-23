@@ -1,0 +1,13 @@
+<MIPSSim>
+  <FunctUnits>
+    <Load   number="2" latency="4"/>
+    <Store  number="2" latency="8"/>
+    <ALU    number="4" latency="1"/>
+    <Branch class="BranchUnit" forward_branch="nottaken" backward_branch="taken" latency="1"/>
+  </FunctUnits>
+  <Registers>
+    <R1 value="0"/>
+    <R2 value="30"/>
+  </Registers>
+  <Memory size="64"/>
+</MIPSSim>

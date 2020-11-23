@@ -1,0 +1,15 @@
+        BEQZ   R2,End
+        DADDIU R2,R2,#-1
+        DADDU  R3,R0,R0
+        SD     R3,0(R1)
+        DADDIU R4,R0,#1
+        SD     R4,8(R1)
+        BEQZ   R2,End
+Loop:   DADDIU R2,R2,#-1
+        DADDIU R1,R1,#16
+        DADDU  R3,R3,R4
+        SD     R3,0(R1)
+        DADDU  R4,R3,R4
+        SD     R4,8(R1)
+        BNE    R2,R0,Loop
+End:    DADDIU R1,R1,#16
