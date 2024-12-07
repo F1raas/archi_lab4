@@ -84,8 +84,9 @@ class Simulator:
         # instruction dans un seul coup d'horloge.
 
         #On sanctionne l'instruction via le ROB ( Premier élément de celui-ci )
-        self.commit()
-
+        for _ in range(self.max_commit):
+            if len(self.ROB) > 0: 
+                self.commit()
         #Décrémentation du temps sur les unités fonctionnelles
         self.decrement_time()
 
@@ -96,16 +97,17 @@ class Simulator:
             #Le programme va terminer son exécution dès que le ROB sera vide.
             self.PC = self.new_PC
         else:
+            for i in range(self.max_issue):
             #Avancement du Issue/Program Counter (PC)
-            if self.new_PC != None: #Si branchement
-                self.PC = self.new_PC
-            else:
-                self.PC = self.PC + 1
-            self.new_PC = None
+                if self.new_PC != None: #Si branchement
+                    self.PC = self.new_PC
+                else:
+                    self.PC = self.PC + 1
+                self.new_PC = None
 
             #Lance l'instruction à self.PC
-            self.issue()
-
+                if self.PC < len(self.instructions):
+                    self.issue()
         #Mise à jour de la trace
         for t in self.trace:
             t.update(self)
@@ -601,6 +603,8 @@ class Simulator:
             mem_init_values = []
         mem_size = int(xml_data.getElementsByTagName('Memory')[0]._attrs['size'].value)
         self.mem = components.Memory(mem_size, mem_init_values)
+        self.max_issue = int(xml_data.getElementsByTagName('max_issue')[0]._attrs['number'].value) 
+        self.max_commit = int(xml_data.getElementsByTagName('max_commit')[0]._attrs['number'].value) 
 
 def update_operands(funit, rob_entry):
     '''

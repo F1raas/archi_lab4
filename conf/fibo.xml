@@ -10,4 +10,9 @@
     <R2 value="30"/>
   </Registers>
   <Memory size="64"/>
+
+  <Lancement_multiple>
+    <max_commit number="1"/>
+    <max_issue number="1"/>
+  </Lancement_multiple>
 </MIPSSim>
