@@ -4,7 +4,7 @@
     <Store  number="2" latency="4"/>
     <Add    number="2" latency="2"/>
     <ALU    number="4" latency="1"/>
-    <Branch class="BranchUnit" forward_branch="nottaken" backward_branch="taken" latency="1"/>
+    <Branch class="BranchUnit" forward_branch="nottaken" backward_branch="taken" tables="4" entries="4" tag_length="5" history_length="5" latency="1"/>
   </FunctUnits>
   <Registers>
     <R1 value="192"/>
@@ -16,7 +16,7 @@
   </Memory>
 
     <Lancement_multiple>
-    <max_commit number="10"/>
-    <max_issue number="10"/>
+    <max_commit number="4"/>
+    <max_issue number="4"/>
   </Lancement_multiple>
 </MIPSSim>

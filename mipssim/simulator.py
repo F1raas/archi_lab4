@@ -18,6 +18,7 @@ import interpreter as interp
 from interpreter import memory_re
 import components
 from components import State
+from predicateur import *
 
 
 class Simulator:
@@ -606,6 +607,9 @@ class Simulator:
         self.max_issue = int(xml_data.getElementsByTagName('max_issue')[0]._attrs['number'].value) 
         self.max_commit = int(xml_data.getElementsByTagName('max_commit')[0]._attrs['number'].value) 
 
+    def getPredictorsCount(self):
+        return self.RS["Branch"][0].getPredictorsCount()
+    
 def update_operands(funit, rob_entry):
     '''
     Remplace les opérandes dans qk et/ou qj avec les valeurs nouvellement calculées.

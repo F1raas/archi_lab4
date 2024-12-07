@@ -9,6 +9,7 @@
 
 
 from collections import OrderedDict, namedtuple
+from predicateur import *
 
 #16 registres c'est suffisant pour les exemples nous intéressant.
 #Normalement, c'est 32, mais ça ne fait que réduire la lisibilité des
@@ -179,11 +180,30 @@ class BranchUnit(FuncUnit):
      l'utiliser à la place de celle-ci.
     '''
     def __init__(self, name, latency, forward_branch, backward_branch, **kwargs):
-        #Important: appel au constructeur de la classe de base.
+        # Important: appel au constructeur de la classe de base.
         super(BranchUnit, self).__init__(name, latency, **kwargs)
+
+        # Configuration des paramètres du prédicteur
+        num_tables = int(kwargs["tables"])
+        entries_per_table = int(kwargs["entries"])
+        tag_length = int(kwargs["tag_length"])
+        history_length = int(kwargs["history_length"])
 
         self.forward_branch = forward_branch
         self.backward_branch = backward_branch
+
+        # Initialisation du prédicteur hybride
+        self.predictor = HybridBranchPredictor(
+            num_tables=num_tables,
+            entries_per_table=entries_per_table,
+            history_length=history_length,
+            tag_bit_length=tag_length,
+            initial_state=BranchState.WEAKLY_TAKEN,
+            base_predictor_entries=4
+        )
+        self.prediction_data = None
+        self.good_prediction = 0
+        self.bad_prediction = 0
 
     def get_prediction(self, PC, dest):
         '''
@@ -194,27 +214,46 @@ class BranchUnit(FuncUnit):
         # Vrai si le branch va vers l'avant
         is_forward_branch = dest > PC
 
-        if (self.forward_branch == 'taken' and is_forward_branch)\
-          or (self.backward_branch == 'taken' and not is_forward_branch):
-            #Prédiction d'un branchement pris.
-            prediction = True
+        prediction, self.prediction_data = self.predictor.predict(PC)
+
+        if prediction == BranchDecision.TAKEN:
+            prediction_result = True
         else:
-            #Prédiction d'un branchement non pris.
-            prediction = False
+            prediction_result = False
 
-        #Stock la prédiction pour le moment ou il faudra ajuster le modèle.
-        self.prediction = prediction
+        if (self.forward_branch == 'taken' and is_forward_branch) or (self.backward_branch == 'taken' and not is_forward_branch):
+            prediction_result = True
 
-        return prediction
+        self.prediction = prediction_result
+        return prediction_result
 
     def update(self, branch_taken):
         '''
         Met à jour le modèle interne de prédiction (si applicable) en fonction
          du résultat du branchement.
         '''
-        #Le BranchUnit que nous utilison ne met pas à jour son modèle...
-        pass
+        self.predictor.update(self.prediction_data, BranchDecision.from_bool(branch_taken))
 
+        #Le BranchUnit que nous utilison ne met pas à jour son modèle...
+        if self.prediction == branch_taken: 
+            self.good_prediction += 1
+        else : 
+            self.bad_prediction += 1
+
+    def getPredictorsCount(self):
+        '''
+        Récupère les statistiques d'utilisation des prédicteurs.
+        '''
+        result = "\n"
+
+        for i, count in enumerate(self.predictor.usage_counters):
+            result += f"Predictor {i}: {count}\n"
+
+        result += f"\nBonne prédiction    : {self.good_prediction}\n"
+        result += f"Mauvaise prédiction : {self.bad_prediction}\n"
+
+        return result
+    
 
 def check_valid_register(func):
     '''

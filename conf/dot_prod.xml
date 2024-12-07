@@ -5,7 +5,7 @@
     <ALU   number="4" latency="1"/>
     <Mult  number="2" latency_mul="8" latency_div="30"/>
     <Add   number="2" latency="2"/>
-    <Branch class="BranchUnit" forward_branch="nottaken" backward_branch="taken" latency="1"/>
+    <Branch class="BranchUnit" forward_branch="nottaken" backward_branch="taken" tables="4" entries="4" tag_length="5" history_length="5" latency="1"/>
   </FunctUnits>
   <Registers>
     <R1 value="0"/>
