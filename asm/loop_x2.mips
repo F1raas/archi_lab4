@@ -1,0 +1,8 @@
+Loop: L.D    F0,0(R1)
+      ADD.D  F4,F0,F2
+      S.D    F4,0(R1)
+      L.D    F1,-8(R1)
+      ADD.D  F5,F1,F2
+      S.D    F5,-8(R1)
+      DADDI  R1,R1,#-16
+      BNE    R1,R2,Loop
