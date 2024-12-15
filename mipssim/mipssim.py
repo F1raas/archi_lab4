@@ -36,6 +36,8 @@ def main(config_file, source_file, trace_file, latex_trace_file, debug):
     # Démarrage du simulateur
     print('Démarrage de la simulation.')
     err = simulator.go()
+    print(simulator.getPredictorsCount())
+
     print('Arrêt de la simulation.')
 
     # Affichage de l'état final de la mémoire et des registre.
