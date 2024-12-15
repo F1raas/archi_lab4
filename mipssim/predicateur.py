@@ -133,3 +133,49 @@ class HybridBranchPredictor:
             self.base_predictor.update(program_counter, branch_taken)
         elif tag is not None:
             self.tables[table - 1][tag].update(program_counter, branch_taken)
+
+def test_hybrid_branch_predictor():
+    num_tables = 2
+    entries_per_table = 4
+    history_length = 2
+    tag_bit_length = 2
+    initial_state = BranchState.WEAKLY_TAKEN
+    base_predictor_entries = 8
+
+    predictor = HybridBranchPredictor(
+        num_tables=num_tables,
+        entries_per_table=entries_per_table,
+        history_length=history_length,
+        tag_bit_length=tag_bit_length,
+        initial_state=initial_state,
+        base_predictor_entries=base_predictor_entries
+    )
+
+    test_branches = [
+        (100, True),
+        (104, False),
+        (100, True),
+        (108, True),
+        (112, False),
+        (100, False),
+        (104, True),
+        (108, False),
+        (112, True),
+        (100, True),
+    ]
+
+    for pc, taken in test_branches:
+        print("\n---")
+        print(f"Branch at PC={pc} is {'TAKEN' if taken else 'NOT TAKEN'}")
+        
+        prediction, info = predictor.predict(pc)
+        print(f"Prediction: {prediction.name}")
+
+        actual_decision = BranchDecision.TAKEN if taken else BranchDecision.NOT_TAKEN
+        predictor.update(info, actual_decision)
+
+    print("\nFinal Predictor States:")
+    print(predictor)
+
+if __name__ == "__main__":
+    test_hybrid_branch_predictor()
